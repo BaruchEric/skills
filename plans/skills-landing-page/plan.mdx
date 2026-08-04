@@ -1,0 +1,353 @@
+---
+title: "Skills for coding agents — landing page"
+brief: "Dark dev-tool landing/catalog page for the 10 skills, built with Vite + React + TS"
+kind: "plan"
+localOnly: true
+---
+
+<RichText id="intro">
+
+# Skills for coding agents — landing page
+
+Build a single, static landing page that showcases the ten skills in this repo
+as a scannable catalog: a hero with the one-line install command and a grid of
+skill cards, one per `/command`. The aesthetic is **dark dev-tool** — near-black
+background, hairline borders, monospace command names, and a neon-mint accent on
+calls-to-action and card hover.
+
+**Done means:** `bun run build` produces a static `dist/` with no type errors; all
+ten cards render from a single typed data array and link to their skill README;
+the page is responsive (3-col → 1-col) with a working light/dark toggle; and both
+themes pass a contrast check. The product decisions are settled — see **Decisions**
+below.
+
+</RichText>
+
+<RichText id="h-page">
+
+### The page
+
+The primary review surface. Top nav, hero with the install command, then a
+three-column grid of all ten skill cards. This is what ships.
+
+</RichText>
+
+<WireframeBlock id="wf-landing">
+<Screen surface="browser" caption="Landing page: theme toggle in the nav, hero + install command, then a 3-column grid; the two skills with media show a thumbnail." html={`<div style="display:flex;flex-direction:column;gap:14px;padding:18px;height:100%;box-sizing:border-box">
+  <div style="display:flex;align-items:center;width:100%;gap:10px">
+    <strong>skills</strong>
+    <small class="wf-muted">for coding agents</small>
+    <div style="flex:1"></div>
+    <span style="display:inline-flex;border:1.4px solid var(--wf-line);border-radius:999px;overflow:hidden"><span class="wf-pill accent" style="border-radius:0">Dark</span><span class="wf-pill" style="border-radius:0">Light</span></span>
+    <span class="wf-pill">Docs</span>
+    <span class="wf-pill">GitHub</span>
+  </div>
+  <div style="display:flex;flex-direction:column;gap:8px">
+    <h1>Skills for coding agents</h1>
+    <p class="wf-muted">Small, composable skills. Stay sharp where judgment matters.</p>
+    <div class="wf-card" style="display:flex;align-items:center;gap:10px;padding:10px 12px;align-self:flex-start">
+      <span>npx @agent-native/skills@latest add</span>
+      <span class="wf-pill accent">Copy</span>
+    </div>
+  </div>
+  <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px">
+    <div class="wf-card" style="display:flex;flex-direction:column;gap:6px;padding:10px;min-width:0"><strong>/visual-plan</strong><small class="wf-muted">Text plans -> rich visual plans</small><div style="height:44px;border-radius:8px;background:var(--wf-accent-soft);border:1.4px solid var(--wf-line)"></div><span class="wf-pill accent" style="align-self:flex-start">plan</span></div>
+    <div class="wf-card" style="display:flex;flex-direction:column;gap:6px;padding:10px;min-width:0"><strong>/visual-recap</strong><small class="wf-muted">Diffs -> interactive recaps</small><div style="height:44px;border-radius:8px;background:var(--wf-accent-soft);border:1.4px solid var(--wf-line)"></div><span class="wf-pill accent" style="align-self:flex-start">review</span></div>
+    <div class="wf-card" style="display:flex;flex-direction:column;gap:4px;padding:10px;min-width:0"><strong>/agent-watchdog</strong><small class="wf-muted">Audit another agent's work</small><span class="wf-pill" style="align-self:flex-start">review</span></div>
+    <div class="wf-card" style="display:flex;flex-direction:column;gap:4px;padding:10px;min-width:0"><strong>/plan-arbiter</strong><small class="wf-muted">Compare plans, pick one</small><span class="wf-pill" style="align-self:flex-start">plan</span></div>
+    <div class="wf-card" style="display:flex;flex-direction:column;gap:4px;padding:10px;min-width:0"><strong>/plow-ahead</strong><small class="wf-muted">Work through ambiguity</small><span class="wf-pill" style="align-self:flex-start">execute</span></div>
+    <div class="wf-card" style="display:flex;flex-direction:column;gap:4px;padding:10px;min-width:0"><strong>/efficient-fable</strong><small class="wf-muted">Fable orchestrates the fleet</small><span class="wf-pill" style="align-self:flex-start">efficiency</span></div>
+    <div class="wf-card" style="display:flex;flex-direction:column;gap:4px;padding:10px;min-width:0"><strong>/efficient-frontier</strong><small class="wf-muted">Same, any frontier model</small><span class="wf-pill" style="align-self:flex-start">efficiency</span></div>
+    <div class="wf-card" style="display:flex;flex-direction:column;gap:4px;padding:10px;min-width:0"><strong>/stay-within-limits</strong><small class="wf-muted">Pause before usage caps</small><span class="wf-pill" style="align-self:flex-start">execute</span></div>
+    <div class="wf-card" style="display:flex;flex-direction:column;gap:4px;padding:10px;min-width:0"><strong>/quick-recap</strong><small class="wf-muted">Green / yellow / red status</small><span class="wf-pill" style="align-self:flex-start">docs</span></div>
+    <div class="wf-card" style="display:flex;flex-direction:column;gap:4px;padding:10px;min-width:0"><strong>/read-the-damn-docs</strong><small class="wf-muted">Docs before guessing</small><span class="wf-pill" style="align-self:flex-start">docs</span></div>
+  </div>
+</div>`} />
+</WireframeBlock>
+
+<RichText id="h-card">
+
+### Skill card — default and hover
+
+The card is the one repeated component — each card is a link to that skill's
+README on GitHub. Hover adds the neon accent border and a "View skill" affordance;
+everything else stays put so the two states are directly comparable.
+
+</RichText>
+
+<Columns id="cols-card">
+<Column id="cols-card-default" label="Default">
+
+<WireframeBlock id="wf-card-default">
+<Screen surface="panel" caption="Resting card." html={`<div style="display:flex;flex-direction:column;gap:10px;padding:16px;height:100%;box-sizing:border-box">
+  <div class="wf-card" style="display:flex;flex-direction:column;gap:8px;padding:14px">
+    <strong>/visual-recap</strong>
+    <small class="wf-muted">Turn a branch, commit, or PR diff into an interactive recap.</small>
+    <div style="display:flex;gap:6px"><span class="wf-pill">review</span></div>
+  </div>
+</div>`} />
+</WireframeBlock>
+
+</Column>
+<Column id="cols-card-hover" label="Hover">
+
+<WireframeBlock id="wf-card-hover">
+<Screen surface="panel" caption="Hover: accent border + View skill — links to the skill's README on GitHub." html={`<div style="display:flex;flex-direction:column;gap:10px;padding:16px;height:100%;box-sizing:border-box">
+  <div class="wf-card" style="display:flex;flex-direction:column;gap:8px;padding:14px;border:1.4px solid var(--wf-accent)">
+    <strong>/visual-recap</strong>
+    <small class="wf-muted">Turn a branch, commit, or PR diff into an interactive recap.</small>
+    <div style="display:flex;align-items:center;gap:6px"><span class="wf-pill accent">review</span><div style="flex:1"></div><span style="color:var(--wf-accent)">View skill -></span></div>
+  </div>
+</div>`} />
+</WireframeBlock>
+
+</Column>
+</Columns>
+
+<RichText id="h-stack">
+
+### Stack decision
+
+</RichText>
+
+<Callout id="callout-stack" tone="decision">
+
+Build with **Vite + React + TypeScript** and plain **CSS variables** — no UI
+framework. React gives one clean `SkillCard` component and a data-driven grid;
+Vite ships a tiny static `dist/` with no runtime dependencies; CSS variables carry
+the dark dev-tool theme without pulling in Tailwind. The ten skills live in one
+typed `skills.ts` array, so adding a skill is a one-line change rather than new
+markup.
+
+</Callout>
+
+<RichText id="h-files">
+
+### Project structure
+
+A standard Vite SPA. Everything user-facing is four small files under `src/`.
+
+</RichText>
+
+<FileTree
+  id="filetree"
+  title="New project"
+  entries={[
+    { path: "index.html", change: "added", note: "Vite entry; mounts #root." },
+    { path: "src/main.tsx", change: "added", note: "Renders <App/> into #root." },
+    { path: "src/App.tsx", change: "added", note: "Hero + grid; maps over skills." },
+    { path: "src/SkillCard.tsx", change: "added", note: "Card as a link to the skill README; renders media when present." },
+    { path: "src/skills.ts", change: "added", note: "Typed data for all ten skills." },
+    { path: "src/theme.css", change: "added", note: "Light + dark token sets, toggled via data-theme." },
+    { path: "public/media/", change: "added", note: "visual-plan.png + visual-recap.gif copied from repo /media." },
+    { path: "vite.config.ts", change: "added", note: "base: '/skills/' for GitHub Pages project path." },
+    { path: "package.json", change: "added", note: "dev / build / preview / deploy scripts." },
+  ]}
+/>
+
+<RichText id="h-data">
+
+### Skills data — one source of truth
+
+The grid is generated from this array. Each entry maps to one real
+`skills/<name>/SKILL.md` in the repo; adding a skill means adding one line here.
+
+</RichText>
+
+<AnnotatedCode
+  id="ac-skills"
+  filename="src/skills.ts"
+  language="ts"
+  code={`export type Skill = {
+  command: string
+  tagline: string
+  tag: "plan" | "review" | "execute" | "efficiency" | "docs"
+  media?: string
+}
+
+export const skills: Skill[] = [
+  { command: "/visual-plan", tagline: "Text plans -> rich visual plans", tag: "plan", media: "visual-plan.png" },
+  { command: "/visual-recap", tagline: "Diffs -> interactive recaps", tag: "review", media: "visual-recap.gif" },
+  { command: "/agent-watchdog", tagline: "Audit another agent's work", tag: "review" },
+  { command: "/plan-arbiter", tagline: "Compare plans, pick one", tag: "plan" },
+  { command: "/plow-ahead", tagline: "Work through ambiguity", tag: "execute" },
+  { command: "/efficient-fable", tagline: "Fable orchestrates the fleet", tag: "efficiency" },
+  { command: "/efficient-frontier", tagline: "Same, any frontier model", tag: "efficiency" },
+  { command: "/stay-within-limits", tagline: "Pause before usage caps", tag: "execute" },
+  { command: "/quick-recap", tagline: "Green / yellow / red status", tag: "docs" },
+  { command: "/read-the-damn-docs", tagline: "Docs before guessing", tag: "docs" },
+]`}
+  annotations={[
+    { lines: "6", label: "Optional", note: "Only visual-plan and visual-recap ship media; other cards stay text-only." },
+    { lines: "9-20", label: "Source of truth", note: "App.tsx maps over this; each card links to /skills/<command>/README.md, derived from command." },
+  ]}
+/>
+
+<RichText id="h-components">
+
+### Key components
+
+</RichText>
+
+<TabsBlock
+  id="tabs-components"
+  tabs={[
+    {
+      id: "tab-app",
+      label: "App.tsx",
+      blocks: [
+        {
+          id: "ac-app",
+          type: "annotated-code",
+          data: {
+            filename: "src/App.tsx",
+            language: "tsx",
+            code: "import { useState } from \"react\"\nimport { skills } from \"./skills\"\nimport { SkillCard } from \"./SkillCard\"\nimport \"./theme.css\"\n\nexport function App() {\n  const [theme, setTheme] = useState<\"dark\" | \"light\">(\"dark\")\n  return (\n    <main className=\"page\" data-theme={theme}>\n      <nav className=\"topbar\">\n        <span className=\"brand\">skills</span>\n        <div className=\"spacer\" />\n        <button className=\"toggle\" onClick={() => setTheme(theme === \"dark\" ? \"light\" : \"dark\")}>\n          {theme === \"dark\" ? \"Light\" : \"Dark\"}\n        </button>\n        <a href=\"https://github.com/BuilderIO/skills\">GitHub</a>\n      </nav>\n      <header className=\"hero\">\n        <h1>Skills for coding agents</h1>\n        <p>Small, composable skills. Stay sharp where judgment matters.</p>\n        <code className=\"install\">npx @agent-native/skills@latest add</code>\n      </header>\n      <section className=\"grid\">\n        {skills.map((s) => (\n          <SkillCard key={s.command} skill={s} />\n        ))}\n      </section>\n    </main>\n  )\n}",
+            annotations: [
+              { lines: "9", label: "Theme", note: "data-theme on the root flips the token set; dark is the default." },
+              { lines: "13-15", label: "Toggle", note: "Swaps dark/light; add a useEffect to persist to localStorage to make it sticky." },
+              { lines: "24-26", label: "Data-driven", note: "Grid renders straight from the array — no hardcoded cards." },
+            ],
+          },
+        },
+      ],
+    },
+    {
+      id: "tab-card",
+      label: "SkillCard.tsx",
+      blocks: [
+        {
+          id: "ac-card",
+          type: "annotated-code",
+          data: {
+            filename: "src/SkillCard.tsx",
+            language: "tsx",
+            code: "import type { Skill } from \"./skills\"\n\nconst REPO = \"https://github.com/BuilderIO/skills/blob/main/skills\"\n\nexport function SkillCard({ skill }: { skill: Skill }) {\n  const slug = skill.command.replace(/^\\//, \"\")\n  return (\n    <a className=\"card\" href={`${REPO}/${slug}/README.md`}>\n      <h3 className=\"cmd\">{skill.command}</h3>\n      <p className=\"tagline\">{skill.tagline}</p>\n      {skill.media && (\n        <img className=\"thumb\" src={`/media/${skill.media}`} alt={`${skill.command} preview`} />\n      )}\n      <span className={`tag tag-${skill.tag}`}>{skill.tag}</span>\n    </a>\n  )\n}",
+            annotations: [
+              { lines: "8", label: "Links out", note: "Card is an anchor to the skill's README on GitHub (slug from command)." },
+              { lines: "11-13", label: "Media", note: "Only visual-plan and visual-recap have media; other cards skip the img." },
+            ],
+          },
+        },
+      ],
+    },
+  ]}
+/>
+
+<RichText id="h-tokens">
+
+### Design tokens — dark dev-tool
+
+The whole aesthetic lives in a handful of CSS variables. Mono command names, a
+near-black surface stack, and a single neon-mint accent for CTAs and hover. A
+`[data-theme="light"]` block overrides the same variables, so the toggle is a
+one-attribute switch.
+
+</RichText>
+
+<Code
+  id="code-tokens"
+  filename="src/theme.css"
+  language="css"
+  caption="Dark is the default; [data-theme='light'] overrides the same variables, so the toggle is a one-attribute switch."
+  code={`:root {
+  --bg: #0b0e14;        /* dark — default */
+  --surface: #11151f;
+  --line: #1e2533;
+  --ink: #e6edf3;
+  --muted: #8b97a7;
+  --accent: #5ef2c0;    /* neon mint — CTAs, hover edge */
+  --accent-2: #7aa2ff;
+  --mono: "Berkeley Mono", ui-monospace, "JetBrains Mono", monospace;
+  --radius: 12px;
+}
+
+[data-theme="light"] {
+  --bg: #f7f9fc;
+  --surface: #ffffff;
+  --line: #e2e8f0;
+  --ink: #0b0e14;
+  --muted: #5b6675;
+  --accent: #0fb88a;
+  --accent-2: #3b6cf0;
+}
+
+.cmd { font-family: var(--mono); color: var(--accent); }
+
+.card {
+  display: block;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  color: var(--ink);
+  text-decoration: none;
+  transition: border-color .15s, transform .15s;
+}
+.card:hover { border-color: var(--accent); transform: translateY(-2px); }
+
+.thumb { width: 100%; border-radius: 8px; border: 1px solid var(--line); }`}
+/>
+
+<RichText id="h-build">
+
+### Build and deploy
+
+Ships to **GitHub Pages**: `vite build` emits a static `dist/`, published with
+`gh-pages -d dist` (or a Pages Action on push to `main`). Set `base: '/skills/'`
+in `vite.config.ts` so assets and the `/media/` images resolve under the
+project-pages path.
+
+</RichText>
+
+<Code
+  id="code-build"
+  filename="package.json"
+  language="json"
+  caption="Static dist/ deployed to GitHub Pages via gh-pages -d dist."
+  code={`{
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc -b && vite build",
+    "preview": "vite preview",
+    "deploy": "gh-pages -d dist"
+  }
+}`}
+/>
+
+<RichText id="h-verify">
+
+### Verification
+
+</RichText>
+
+<Checklist
+  id="checklist-verify"
+  items={[
+    { id: "v-build", label: "bun run build produces dist/ with zero type errors" },
+    { id: "v-cards", label: "Open dist/index.html — all ten cards render with the right tag" },
+    { id: "v-hover", label: "Hover a card — accent border + lift, View skill appears" },
+    { id: "v-link", label: "Click a card — opens that skill's README on GitHub" },
+    { id: "v-toggle", label: "Toggle theme — both light and dark render correctly" },
+    { id: "v-media", label: "visual-plan and visual-recap show thumbnails; the rest stay text-only" },
+    { id: "v-responsive", label: "Resize to mobile width — grid collapses to one column, no overflow", note: "Use a CSS grid auto-fit/minmax or a media query." },
+    { id: "v-contrast", label: "Lighthouse a11y + contrast pass on both themes" },
+    { id: "v-real", label: "Each card's command matches a real skills/<name>/SKILL.md" },
+  ]}
+/>
+
+<RichText id="h-decisions">
+
+### Decisions
+
+</RichText>
+
+<Callout id="callout-decisions" tone="decision">
+
+Settled for the first cut:
+
+- **Deploy:** GitHub Pages — `gh-pages -d dist`, `base: '/skills/'`.
+- **Card click:** each card links to the skill's `README.md` on GitHub.
+- **Theme:** light/dark toggle, dark by default.
+- **Media:** thumbnails on the two skills that have them (`/visual-plan`, `/visual-recap`); the rest stay text-only.
+
+</Callout>
