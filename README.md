@@ -1,11 +1,6 @@
-# Skills for coding agents
+# Skills for agents
 
-Small, composable skills for coding agents.
-
-These skills are for teams that want the agent to stay sharp where judgment
-matters: orchestration, review, planning, validation, docs discipline, and clear
-communication. They are not a giant process framework. Install the pieces you
-want, adapt them to your project, and let the model keep room to think.
+Small, composable skills for your favorite agent.
 
 ### Quick install recommended skills
 
@@ -13,10 +8,76 @@ want, adapt them to your project, and let the model keep room to think.
 npx @agent-native/skills@latest add
 ```
 
-The interactive picker puts `/visual-plan` and `/visual-recap` first and selects
-only those by default. See the [full CLI docs below](#install).
+See the [full CLI docs below](#install).
 
-## Skills
+## Skills At A Glance
+
+- [`/an`](skills/an/SKILL.md) - Open and operate Agent-Native apps beside the conversation.
+- [`/webmcp`](skills/webmcp/README.md) - Open web apps in the built-in browser and use MCP tools first.
+- [`/visual-plan`](#visual-plan) - Turn text plans into rich visual plans.
+- [`/visual-recap`](#visual-recap) - Turn diffs into interactive visual recaps.
+- [`/visual-edit`](#visual-edit) - Open a running local app for visual editing.
+- [`/rewind`](#rewind) - Recover recent local screen context through Clips Desktop.
+- [`/agent-watchdog`](#agent-watchdog) - Audit another agent's work.
+- [`/plan-arbiter`](#plan-arbiter) - Compare competing plans and choose a direction.
+- [`/plow-ahead`](#plow-ahead) - Keep working through ordinary ambiguity.
+- [`/efficient-fable`](#efficient-fable) - Orchestrate Fable with cheaper helper agents.
+- [`/efficient-frontier`](#efficient-frontier) - Preserve high-cost models for judgment.
+- [`/stay-within-limits`](#stay-within-limits) - Track usage limits before long-running work.
+- [`/quick-recap`](#quick-recap) - End work with a clear status signal.
+- [`/read-the-damn-docs`](#read-the-damn-docs) - Check authoritative docs before guessing.
+- [`/turn-into-app`](#turn-into-app) - Turn the current thread or a skill into a runnable Agent-Native app.
+
+## Skill Details
+
+### [`/an`](skills/an/SKILL.md)
+
+Open a granted Agent-Native app in the host's inline MCP App or built-in browser
+surface, then keep the agent connected to the app's live UI and screen state.
+For example, run `/an slides` to open Slides, sign in in that browser
+surface, and then ask the agent to create or update the deck. Focused requests
+such as `make this bigger` use the Slides selection state and a bounded
+readback-verified edit.
+
+The plugin registers Dispatch MCP automatically for Claude and Codex at
+`https://dispatch.agent-native.com/mcp`. In ChatGPT, add that same URL as
+an OAuth custom connector. The host may need a reload or connector rescan after
+installation.
+
+### [`/webmcp`](skills/webmcp/README.md)
+
+Open a requested URL in the host's built-in browser and use the page's MCP or
+WebMCP tools before browser UI automation for app communication or edits. For
+example, run `/webmcp slides.agent-native.com make me a new deck about onboarding`
+to open Slides and complete the request in that tab. The skill waits for the
+user to sign in when needed, then calls the page's `window.__agentNativeWebMcp`
+helper from the host's JavaScript evaluator (or a host WebMCP bridge when one
+is exposed): one screen read, one smallest mutation, one readback. If neither
+is available, it stops before a state-changing click or type fallback and
+reports the limitation.
+
+### [`/visual-edit`](skills/visual-edit/README.md)
+
+Open a running local app in Design as URL-backed iframe screens for visual
+inspection, route-state exploration, and source-backed editing.
+
+Unlike a static mockup, the canvas stays connected to the app's real routes and
+the local bridge. Use `/visual-edit` when a UI needs to be reviewed or changed
+in context, including responsive states and multi-screen flows.
+
+### [`/rewind`](skills/rewind/README.md)
+
+Use local Clips Rewind screen memory to recover a recent moment: what was said,
+what appeared on screen, or what happened just before the current task. It
+searches bounded local chapters, transcripts, OCR, and frames first; it is not a
+hosted recording archive and does not upload raw local media by default.
+
+Rewind requires macOS, the signed
+[Clips Desktop app](https://clips.agent-native.com/download), and a compatible
+agent with the local `clips-screen-memory` MCP connection. If you invoke Rewind
+before installing Clips, the skill asks permission to open the official install
+flow instead of silently installing capture software. Follow the [Rewind setup
+and first-test guide](skills/rewind/README.md).
 
 ### [`/visual-plan`](skills/visual-plan/README.md)
 
@@ -31,7 +92,7 @@ changes start.
   <img alt="Visual plan review surface" src="media/visual-plan.png">
 </picture>
 
-Visual plans are MDX, customizable with your own components, and are viewed with the [Agent-Native plans app](https://www.agent-native.com/docs/template-plan). [Source here](https://github.com/BuilderIO/agent-native/)
+Visual plans are MDX, customizable with your own components, and are viewed with the [Agent-Native plans app](https://www.agent-native.com/docs/template-plan). In local-files mode, `/visual-plan` writes and serves MDX locally through a localhost bridge instead of uploading plan content to the hosted database. [Source here](https://github.com/BuilderIO/agent-native/)
 
 ### [`/visual-recap`](skills/visual-recap/README.md)
 
@@ -149,6 +210,17 @@ and repo-specific contracts all require a docs pass before implementation. For
 external APIs and current product behavior, web search for official docs is
 usually the first move.
 
+### [`/turn-into-app`](skills/turn-into-app/README.md)
+
+At the end of a thread, turn the current workflow into a fresh Agent-Native app
+with clear buttons, visible agent steps, a running local preview, and a concise
+deployment handoff. At the beginning of a thread, pass a skill name or workflow
+path, such as `/turn-into-app /some-skill`, to use that source immediately.
+Codex threads and local transcript exports work today; ChatGPT shared links and
+Claude web/project imports are marked coming soon. The result should be the
+concrete workflow app, not a generic app-builder intake form. Local previews can
+use ignored `.env` setting `AUTH_DISABLED=1` so they open without an account.
+
 ## Install
 
 Run the installer:
@@ -157,8 +229,8 @@ Run the installer:
 npx @agent-native/skills@latest add
 ```
 
-The picker shows the full catalog, with `/visual-plan` and `/visual-recap` at
-the top and preselected by default. Toggle any additional skills you want.
+The picker shows the full catalog, with the recommended skills preselected.
+Toggle any additional skills you want.
 
 The installer walks you through the choices:
 
@@ -173,12 +245,18 @@ The installer walks you through the choices:
   selected skills have always-on guidance.
 - Whether to add the PR Visual Recap GitHub Action when `/visual-recap` is
   selected.
+- Whether to configure a compatible local agent connection when `/rewind` is
+  selected. The installer does not install Clips Desktop. If it is missing,
+  invoking Rewind asks permission to open the official download flow; capture
+  remains disabled until you turn it on in the Clips tray.
 
 Skip the picker with `--skill`:
 
 ```sh
 npx @agent-native/skills@latest add --skill quick-recap
 npx @agent-native/skills@latest add --skill visual-recap --with-github-action
+npx @agent-native/skills@latest add --skill rewind
+npx @agent-native/skills@latest add --skill webmcp
 ```
 
 You can also use Vercel's `skills` CLI for a plain skill-folder copy:
@@ -187,6 +265,63 @@ You can also use Vercel's `skills` CLI for a plain skill-folder copy:
 npx skills@latest add BuilderIO/skills --skill quick-recap
 ```
 
+Do not use the plain-copy installer for Rewind: it cannot configure the local
+`clips-screen-memory` connection. Use `@agent-native/skills` or
+`@agent-native/core` for a complete Rewind setup.
+
 That installer is useful for quick copying, but it does not add the managed
 `AGENTS.md` / `CLAUDE.md` instruction blocks or the PR Visual Recap GitHub
 Action that pair well with these skills.
+
+### Install in Claude Cowork
+
+This repo is also a Claude plugin marketplace for Cowork. To install the
+shareable, updatable plugin in Cowork:
+
+1. Open `Customize` > `Plugins` > `Add marketplace`.
+2. Enter `BuilderIO/skills` (or `https://github.com/BuilderIO/skills`).
+3. Install `Builder Skills` and enable the `webmcp` skill.
+
+Invoke the installed skill with its plugin namespace:
+
+```text
+/builder-skills:webmcp slides inspect the current screen without editing
+```
+
+For Team and Enterprise workspaces, an organization admin can provision the
+marketplace or plugin for everyone. Cowork does not currently expose a
+supported CLI command for installing an account-level plugin; the marketplace
+is shared through Git, while each Cowork user installs it from `Customize`.
+
+### Install in Claude Code
+
+This repo is also a [Claude Code plugin
+marketplace](https://code.claude.com/docs/en/plugin-marketplaces). To install
+all of the skills as a managed, updatable plugin, run these inside Claude Code:
+
+```sh
+/plugin marketplace add BuilderIO/skills
+/plugin install builder-skills@builder-skills
+```
+
+The skills are then namespaced under the plugin (for example,
+`/builder-skills:quick-recap`). Pull future updates with:
+
+```sh
+/plugin marketplace update builder-skills
+```
+
+The plugin installs Rewind's instructions only; it cannot configure the local
+Clips Screen Memory MCP connection. When invoked, Rewind can ask permission to
+open the official Clips Desktop installer, but it must not install or enable
+capture silently. After Clips is installed and Rewind is enabled, also run:
+
+```sh
+npx @agent-native/core@latest skills add rewind --client claude-code --scope user --yes
+```
+
+Treat Rewind as unavailable until `screen_memory_status` succeeds.
+
+This path does not add the managed `AGENTS.md` / `CLAUDE.md` instruction blocks
+or the PR Visual Recap GitHub Action; use the `npx @agent-native/skills`
+installer above if you want those.
